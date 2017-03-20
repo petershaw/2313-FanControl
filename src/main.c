@@ -40,7 +40,7 @@ volatile unsigned int process;
 // Row multiplexer
 ISR (TIMER0_COMPA_vect){
     tick++;
-    if(tick == 500){
+    if(tick == 50){
         tick = 0;
         millisekunden++;
         if(millisekunden == 1000){
@@ -66,8 +66,7 @@ int main(void) {
 	// SETUP
 	init_status_indicator();
 	mark_as_error();
-		
-	_delay_ms(300);
+	_delay_ms(100);
 	
 			
 	// INIT MULTIPLEX TIMER
@@ -78,7 +77,7 @@ int main(void) {
     // Overflow Interrupt erlauben
     TIMSK |= (1<<OCIE0A);
     // Set MAX
-    OCR0A |= 5 -1;
+    OCR0A |= 50 -1;
     
     
 	#if HAS_UART > 0
@@ -86,13 +85,16 @@ int main(void) {
     	//init_uart();
 	#endif
     	
-   	release_error();		 
-	sei();
+   	release_error();
     _delay_ms(100);
+	sei();
+    
 	
 	#if DEBUG > 0
+    #if HAS_UART > 0
 	    uart_puts("-- fan control --\n");
-	#endif    
+    #endif
+    #endif
     process = FALSE;
     
 	// LOOP

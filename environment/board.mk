@@ -12,7 +12,7 @@ EE_MAX_SIZE = 128
 
 # Define the board configuration
 HAS_LCD				= 0
-HAS_UART 			= 1
+HAS_UART 			= 0
 UART_BAUD_RATE		= 9600
 
 # Boards-LED
