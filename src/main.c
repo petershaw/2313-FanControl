@@ -23,6 +23,12 @@
 #error "F_CPU undefined, please define CPU frequency in Hz in Makefile"
 #endif
 
+#if HAS_UART > 0
+#ifndef UART_BAUD_RATE
+#error "UART_BAUD_RATE undefined, please define baund rate in Makefile if compile with UART"
+#endif
+#endif
+
 // DUMMY FUNCTION
 // ---------------------------------------------
 void *dummy(void){return (void *) NULL;}
@@ -37,7 +43,7 @@ volatile unsigned int process;
 
 // INTERRUPT SERVICE
 // ---------------------------------------------
-// Row multiplexer
+// Millisecond timer
 ISR (TIMER0_COMPA_vect){
     tick++;
     if(tick == 50){
@@ -69,7 +75,7 @@ int main(void) {
 	_delay_ms(100);
 	
 			
-	// INIT MULTIPLEX TIMER
+	// INIT TIMER 0 - 8 Bit for ms timer
     // -----------------------------------------
     TCCR0A |= 1<<WGM01;
     // Timer 0, Prescaller /1024; OVF-Interrupt
@@ -82,7 +88,6 @@ int main(void) {
     
 	#if HAS_UART > 0
     	uart_init( UART_BAUD_SELECT(UART_BAUD_RATE, F_CPU) );
-    	//init_uart();
 	#endif
     	
    	release_error();
@@ -104,17 +109,19 @@ int main(void) {
             if(process == FALSE) {
                 process = TRUE;
                 mark_as_error();
+                #if DEBUG > 0
                 #if HAS_UART > 0
                     char buf[10];
                     itoa(sekunde, buf, 10);
                     uart_puts(buf );
                     uart_puts("\n");
                 #endif
+                #endif
             }
         } else {
             process = FALSE;
 			release_error();
 		}
-
+        
 	}
 }
